@@ -1,0 +1,158 @@
+-- SYROX BOOST v2.5 | Optimized & Fixed by Kimi ✓
+-- Universal Mobile Optimizer
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+-- GEREKLİ TABLOLAR
+local OptimizationConnections = {}
+local CurrentMode = nil
+local StabilizerActive = false
+
+-- GUI OLUŞTURMA
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SYROX_Boost_v2"
+ScreenGui.Parent = PlayerGui
+ScreenGui.ResetOnSpawn = false
+
+-- ANA ÇERÇEVE
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 380, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -190, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BorderSizePixel = 0
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.ClipsDescendants = true
+MainFrame.Parent = ScreenGui
+
+local UICorner_Main = Instance.new("UICorner")
+UICorner_Main.CornerRadius = UDim.new(0, 15)
+UICorner_Main.Parent = MainFrame
+
+-- BAŞLIK ÇUBUĞU
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 40)
+TitleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(0, 150, 1, 0)
+TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "SYROX BOOST v2.5"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 14
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = TitleBar
+
+-- SÜRÜKLEME ÖZELLİĞİ (FIXED)
+local dragging, dragInput, dragStart, startPos
+local function update(input)
+    local delta = input.Position - dragStart
+    MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+TitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+
+TitleBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then update(input) end
+end)
+
+-- KAPATMA TUŞU
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -35, 0.5, -15)
+CloseButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CloseButton.Text = "×"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = TitleBar
+Instance.new("UICorner", CloseButton).CornerRadius = UDim.new(0, 8)
+
+-- OPTIMIZASYON FONKSIYONLARI
+local function clearMemory()
+    collectgarbage("collect")
+    setfpscap(999) -- Executor destekliyorsa FPS kilidini açar
+end
+
+local function applyOptimizations(level)
+    pcall(function()
+        if level == "Aggressive" then
+            Lighting.GlobalShadows = false
+            Lighting.Technology = Enum.Technology.Compatibility
+            for _, v in pairs(game:GetDescendants()) do
+                if v:IsA("DataModelMesh") or v:IsA("CharacterMesh") or v:IsA("BasePart") then
+                    if v:IsA("BasePart") then v.CastShadow = false end
+                    if v:IsA("Texture") or v:IsA("Decal") then v.Transparency = 1 end
+                elseif v:IsA("Light") or v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                    v.Enabled = false
+                end
+            end
+            settings().Rendering.QualityLevel = 1
+        elseif level == "Balanced" then
+            Lighting.GlobalShadows = false
+            for _, v in pairs(game:GetDescendants()) do
+                if v:IsA("Texture") or v:IsA("Decal") then v.Transparency = 0.5 end
+            end
+        end
+    end)
+end
+
+-- BUTONLAR (ÖRNEK: AGRESİF MOD)
+local AggressiveBtn = Instance.new("TextButton")
+AggressiveBtn.Size = UDim2.new(0, 340, 0, 45)
+AggressiveBtn.Position = UDim2.new(0.5, -170, 0, 60)
+AggressiveBtn.BackgroundColor3 = Color3.fromRGB(230, 126, 34)
+AggressiveBtn.Text = "AGRESİF MOD (Maksimum FPS)"
+AggressiveBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AggressiveBtn.Font = Enum.Font.GothamBold
+AggressiveBtn.Parent = MainFrame
+Instance.new("UICorner", AggressiveBtn).CornerRadius = UDim.new(0, 10)
+
+AggressiveBtn.MouseButton1Click:Connect(function()
+    AggressiveBtn.Text = "Uygulanıyor..."
+    applyOptimizations("Aggressive")
+    wait(1)
+    AggressiveBtn.Text = "AKTİF: Agresif Mod"
+    AggressiveBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+end)
+
+-- BİLDİRİM
+local function Notify(msg)
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "SYROX Boost",
+        Text = msg,
+        Duration = 3
+    })
+end
+
+CloseButton.MouseButton1Click:Connect(function()
+    MainFrame:TweenSize(UDim2.new(0,0,0,0), "Out", "Quart", 0.5, true)
+    wait(0.5)
+    ScreenGui:Destroy()
+    Notify("Script Kapatıldı.")
+end)
+
+Notify("Yüklendi! Kimi tarafından yapıldı.")
+
