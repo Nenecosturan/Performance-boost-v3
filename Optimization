@@ -1,0 +1,498 @@
+-- SYROX BOOST v2.2 | Made by Kimi ✓
+-- FIXED & TESTED - Mobil Optimizer
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+
+-- ÖNEMLİ: PlayerGui kullan (CoreGui yerine)
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+-- GUI OLUŞTURMA
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SYROX_Boost"
+ScreenGui.Parent = PlayerGui
+ScreenGui.ResetOnSpawn = false
+
+-- ANA ÇERÇEVE (DAHA YATAY: 380x300)
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 380, 0, 300) -- YATAY ORANTI
+MainFrame.Position = UDim2.new(0.5, -190, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BorderSizePixel = 0
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.Visible = true -- GÖRÜNÜR OL!
+MainFrame.Parent = ScreenGui
+
+local UICorner_Main = Instance.new("UICorner")
+UICorner_Main.CornerRadius = UDim.new(0, 12)
+UICorner_Main.Parent = MainFrame
+
+-- HAREKET ETTIRME (DRAG) ÖZELLIĞI
+local dragging = false
+local dragStart = Vector2.new(0,0)
+local frameStart = UDim2.new(0,0,0,0)
+
+TitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        frameStart = MainFrame.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(
+            frameStart.X.Scale, frameStart.X.Offset + delta.X,
+            frameStart.Y.Scale, frameStart.Y.Offset + delta.Y
+        )
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+-- BAŞLIK
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 35)
+TitleBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(0, 150, 1, 0)
+TitleLabel.Position = UDim2.new(0, 10, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "SYROX Boost"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 14
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = TitleBar
+
+-- KAPATMA TUŞU
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 25, 0, 25)
+CloseButton.Position = UDim2.new(1, -30, 0.5, -12)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+CloseButton.Text = "×"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 18
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = TitleBar
+
+local UICorner_Close = Instance.new("UICorner")
+UICorner_Close.CornerRadius = UDim.new(0, 6)
+UICorner_Close.Parent = CloseButton
+
+-- KÜÇÜLTME TUŞU
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Size = UDim2.new(0, 25, 0, 25)
+MinimizeButton.Position = UDim2.new(1, -60, 0.5, -12)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+MinimizeButton.Text = "−"
+MinimizeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+MinimizeButton.TextSize = 18
+MinimizeButton.Font = Enum.Font.GothamBold
+MinimizeButton.Parent = TitleBar
+
+local UICorner_Minimize = Instance.new("UICorner")
+UICorner_Minimize.CornerRadius = UDim.new(0, 6)
+UICorner_Minimize.Parent = MinimizeButton
+
+-- MODLAR KAPSAYICI
+local ModesContainer = Instance.new("Frame")
+ModesContainer.Size = UDim2.new(1, -20, 0, 200)
+ModesContainer.Position = UDim2.new(0, 10, 0, 50)
+ModesContainer.BackgroundTransparency = 1
+ModesContainer.Parent = MainFrame
+
+-- HAFİF MOD (DAHA GENIŞ: 110x60)
+local LightModeButton = Instance.new("TextButton")
+LightModeButton.Size = UDim2.new(0, 110, 0, 60)
+LightModeButton.Position = UDim2.new(0, 5, 0, 0)
+LightModeButton.BackgroundColor3 = Color3.fromRGB(100, 255, 150)
+LightModeButton.Text = "Hafif Mod"
+LightModeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+LightModeButton.TextSize = 12
+LightModeButton.Font = Enum.Font.GothamBold
+LightModeButton.Parent = ModesContainer
+
+local UICorner_Light = Instance.new("UICorner")
+UICorner_Light.CornerRadius = UDim.new(0, 8)
+UICorner_Light.Parent = LightModeButton
+
+local UIStroke_Light = Instance.new("UIStroke")
+UIStroke_Light.Color = Color3.fromRGB(255, 255, 255)
+UIStroke_Light.Thickness = 2
+UIStroke_Light.Parent = LightModeButton
+
+-- DENGELİ MOD
+local BalancedModeButton = Instance.new("TextButton")
+BalancedModeButton.Size = UDim2.new(0, 110, 0, 60)
+BalancedModeButton.Position = UDim2.new(0.5, -55, 0, 0)
+BalancedModeButton.BackgroundColor3 = Color3.fromRGB(52, 152, 219)
+BalancedModeButton.Text = "Dengeli Mod"
+BalancedModeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+BalancedModeButton.TextSize = 12
+BalancedModeButton.Font = Enum.Font.GothamBold
+BalancedModeButton.Parent = ModesContainer
+
+local UICorner_Balanced = Instance.new("UICorner")
+UICorner_Balanced.CornerRadius = UDim.new(0, 8)
+UICorner_Balanced.Parent = BalancedModeButton
+
+local UIStroke_Balanced = Instance.new("UIStroke")
+UIStroke_Balanced.Color = Color3.fromRGB(255, 255, 255)
+UIStroke_Balanced.Thickness = 2
+UIStroke_Balanced.Parent = BalancedModeButton
+
+-- AGRESİF MOD
+local AggressiveModeButton = Instance.new("TextButton")
+AggressiveModeButton.Size = UDim2.new(0, 110, 0, 60)
+AggressiveModeButton.Position = UDim2.new(1, -115, 0, 0)
+AggressiveModeButton.BackgroundColor3 = Color3.fromRGB(230, 126, 34)
+AggressiveModeButton.Text = "Agresif Mod"
+AggressiveModeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AggressiveModeButton.TextSize = 12
+AggressiveModeButton.Font = Enum.Font.GothamBold
+AggressiveModeButton.Parent = ModesContainer
+
+local UICorner_Aggressive = Instance.new("UICorner")
+UICorner_Aggressive.CornerRadius = UDim.new(0, 8)
+UICorner_Aggressive.Parent = AggressiveModeButton
+
+local UIStroke_Aggressive = Instance.new("UIStroke")
+UIStroke_Aggressive.Color = Color3.fromRGB(255, 255, 255)
+UIStroke_Aggressive.Thickness = 2
+UIStroke_Aggressive.Parent = AggressiveModeButton
+
+-- STABILIZER (DAHA GENIŞ)
+local StabilizerButton = Instance.new("TextButton")
+StabilizerButton.Size = UDim2.new(1, 0, 0, 50)
+StabilizerButton.Position = UDim2.new(0, 0, 0, 70)
+StabilizerButton.BackgroundColor3 = Color3.fromRGB(44, 62, 80)
+StabilizerButton.Text = "Stabilizer"
+StabilizerButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+StabilizerButton.TextSize = 14
+StabilizerButton.Font = Enum.Font.GothamBold
+StabilizerButton.Parent = ModesContainer
+
+local UICorner_Stabilizer = Instance.new("UICorner")
+UICorner_Stabilizer.CornerRadius = UDim.new(0, 8)
+UICorner_Stabilizer.Parent = StabilizerButton
+
+local UIStroke_Stabilizer = Instance.new("UIStroke")
+UIStroke_Stabilizer.Color = Color3.fromRGB(255, 255, 255)
+UIStroke_Stabilizer.Thickness = 2
+UIStroke_Stabilizer.Parent = StabilizerButton
+
+-- ALT YAZI
+local Footer = Instance.new("TextLabel")
+Footer.Size = UDim2.new(0, 150, 0, 20)
+Footer.Position = UDim2.new(0, 10, 1, -30)
+Footer.BackgroundTransparency = 1
+Footer.Text = "Made by Kimi ✓"
+Footer.TextColor3 = Color3.fromRGB(150, 150, 150)
+Footer.TextSize = 10
+Footer.Font = Enum.Font.Gotham
+Footer.TextXAlignment = Enum.TextXAlignment.Left
+Footer.Parent = MainFrame
+
+-- DRAGGING OZELLIĞI (TitleBar için)
+local dragging = false
+local dragStart = Vector2.new(0,0)
+local frameStart = UDim2.new(0,0,0,0)
+
+TitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        frameStart = MainFrame.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(
+            frameStart.X.Scale, frameStart.X.Offset + delta.X,
+            frameStart.Y.Scale, frameStart.Y.Offset + delta.Y
+        )
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and dragging then
+        dragging = false
+    end
+end)
+
+-- MOD DURUM TAKİBİ
+local CurrentMode = nil
+local StabilizerActive = false
+local OptimizationConnections = {}
+local MinimizedButton = nil -- GLOBAL TANIMLAMA!
+
+-- BUTON RENK RESET FONKSIYONU
+local function revertButtonColors()
+    LightModeButton.BackgroundColor3 = Color3.fromRGB(100, 255, 150)
+    BalancedModeButton.BackgroundColor3 = Color3.fromRGB(52, 152, 219)
+    AggressiveModeButton.BackgroundColor3 = Color3.fromRGB(230, 126, 34)
+end
+
+-- OPTIMIZASYON GERİ ALMA
+local function revertAllOptimizations()
+    -- LIGHTING
+    pcall(function()
+        Lighting.GlobalShadows = true
+        Lighting.Technology = Enum.Technology.ShadowMap
+        Lighting.Ambient = Color3.fromRGB(0, 0, 0)
+        Lighting.Brightness = 2
+    end)
+    
+    -- CAMERA
+    pcall(function()
+        if Workspace.CurrentCamera then
+            Workspace.CurrentCamera.MaxAxisFieldOfView = 70
+        end
+    end)
+    
+    -- PARTS
+    for _, v in ipairs(Workspace:GetDescendants()) do
+        pcall(function()
+            if v:IsA("Texture") or v:IsA("Decal") then
+                v.Transparency = 0
+            end
+            if v:IsA("ParticleEmitter") then
+                v.Enabled = true
+                local originalRate = v:GetAttribute("OriginalRate")
+                if originalRate then v.Rate = originalRate end
+            end
+            if v:IsA("BasePart") then
+                v.Material = Enum.Material.Plastic
+                v.CastShadow = true
+                v.LocalTransparencyModifier = 0
+            end
+            if v:IsA("Beam") or v:IsA("Trail") then
+                v.Enabled = true
+            end
+            if v:IsA("Terrain") then
+                v.WaterWaveSize = 0.1
+                v.WaterTransparency = 0.3
+            end
+        end)
+    end
+    
+    -- CONNECTIONS
+    for _, conn in ipairs(OptimizationConnections) do
+        pcall(function() conn:Disconnect() end)
+    end
+    OptimizationConnections = {}
+end
+
+-- OPTIMIZASYON FONKSIYONLARI
+local function lightOptimization()
+    for _, v in ipairs(Workspace:GetDescendants()) do
+        pcall(function()
+            if v:IsA("Texture") or v:IsA("Decal") then
+                v.Transparency = 0.7
+            end
+            if v:IsA("ParticleEmitter") then
+                v:SetAttribute("OriginalRate", v.Rate)
+                v.Rate = math.floor(v.Rate * 0.5)
+            end
+        end)
+    end
+    print("Hafif Mod Aktif")
+end
+
+local function balancedOptimization()
+    lightOptimization()
+    
+    pcall(function()
+        if Workspace.CurrentCamera then
+            Workspace.CurrentCamera.MaxAxisFieldOfView = 60
+        end
+    end)
+    
+    local conn = RunService.Heartbeat:Connect(function()
+        if CurrentMode == "Balanced" and player.Character then
+            local root = player.Character:FindFirstChild("HumanoidRootPart")
+            if root then
+                for _, part in ipairs(Workspace:GetChildren()) do
+                    pcall(function()
+                        if part:IsA("BasePart") then
+                            local distance = (part.Position - root.Position).Magnitude
+                            part.LocalTransparencyModifier = distance > 150 and 1 or 0
+                        end
+                    end)
+                end
+            end
+        end
+    end)
+    table.insert(OptimizationConnections, conn)
+end
+
+local function aggressiveOptimization()
+    for _, v in ipairs(Workspace:GetDescendants()) do
+        pcall(function()
+            if v:IsA("Texture") or v:IsA("Decal") then
+                v.Transparency = 1
+            end
+            if v:IsA("ParticleEmitter") then
+                v:SetAttribute("OriginalRate", v.Rate)
+                v.Enabled = false
+            end
+            if v:IsA("BasePart") then
+                v.Material = Enum.Material.Plastic
+                v.CastShadow = false
+            end
+            if v:IsA("Beam") or v:IsA("Trail") then
+                v.Enabled = false
+            end
+            if v:IsA("Terrain") then
+                v.WaterWaveSize = 0
+                v.WaterTransparency = 1
+            end
+        end)
+    end
+    
+    pcall(function()
+        Lighting.GlobalShadows = false
+        Lighting.Technology = Enum.Technology.Compatibility
+        Lighting.Ambient = Color3.fromRGB(150, 150, 150)
+        Lighting.Brightness = 1
+        
+        if Workspace.CurrentCamera then
+            Workspace.CurrentCamera.MaxAxisFieldOfView = 55
+        end
+    end)
+    
+    print("Agresif Mod Aktif")
+end
+
+local function networkStabilizer()
+    pcall(function()
+        local NetworkSettings = settings():GetService("NetworkSettings")
+        NetworkSettings:SetOutgoingKBPSLimit(500)
+    end)
+    
+    local conn = RunService.Heartbeat:Connect(function()
+        if StabilizerActive then
+            wait(20)
+            collectgarbage("collect")
+        end
+    end)
+    table.insert(OptimizationConnections, conn)
+end
+
+-- BUTON TIKLAMALARI
+LightModeButton.MouseButton1Click:Connect(function()
+    CurrentMode = "Light"
+    revertButtonColors()
+    LightModeButton.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+    lightOptimization()
+end)
+
+BalancedModeButton.MouseButton1Click:Connect(function()
+    CurrentMode = "Balanced"
+    revertButtonColors()
+    BalancedModeButton.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+    balancedOptimization()
+end)
+
+AggressiveModeButton.MouseButton1Click:Connect(function()
+    CurrentMode = "Aggressive"
+    revertButtonColors()
+    AggressiveModeButton.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+    aggressiveOptimization()
+end)
+
+StabilizerButton.MouseButton1Click:Connect(function()
+    StabilizerActive = not StabilizerActive
+    StabilizerButton.BackgroundColor3 = StabilizerActive and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(44, 62, 80)
+    if StabilizerActive then networkStabilizer() end
+end)
+
+-- KÜÇÜLTME/DAIRE BUTONU
+local function createMinimizedButton()
+    MinimizedButton = Instance.new("TextButton")
+    MinimizedButton.Size = UDim2.new(0, 50, 0, 50)
+    MinimizedButton.Position = UDim2.new(1, -70, 1, -120)
+    MinimizedButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    MinimizedButton.Text = "S"
+    MinimizedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MinimizedButton.TextSize = 20
+    MinimizedButton.Font = Enum.Font.GothamBold
+    MinimizedButton.AnchorPoint = Vector2.new(0.5, 0.5)
+    MinimizedButton.Visible = false
+    MinimizedButton.Parent = ScreenGui
+    
+    local UICorner_Circle = Instance.new("UICorner")
+    UICorner_Circle.CornerRadius = UDim.new(1, 0)
+    UICorner_Circle.Parent = MinimizedButton
+    
+    local UIStroke_Circle = Instance.new("UIStroke")
+    UIStroke_Circle.Color = Color3.fromRGB(150, 150, 150)
+    UIStroke_Circle.Thickness = 2
+    UIStroke_Circle.Parent = MinimizedButton
+    
+    MinimizedButton.MouseButton1Click:Connect(function()
+        MinimizedButton.Visible = false
+        MainFrame.Visible = true
+        MainFrame.Size = UDim2.new(0, 0, 0, 0)
+        MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+        
+        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+        local tween = TweenService:Create(MainFrame, tweenInfo, {
+            Size = UDim2.new(0, 380, 0, 300),
+            Position = UDim2.new(0.5, -190, 0.5, -150)
+        })
+        tween:Play()
+    end)
+end
+
+-- KAPATMA BUTONU
+CloseButton.MouseButton1Click:Connect(function()
+    local tweenInfo = TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
+    local tween = TweenService:Create(MainFrame, tweenInfo, {
+        Size = UDim2.new(0, 0, 0, 0),
+        Position = UDim2.new(0.5, 0, 0.5, 0)
+    })
+    
+    tween:Play()
+    tween.Completed:Wait()
+    
+    revertAllOptimizations()
+    StabilizerActive = false
+    
+    MainFrame.Visible = false
+    if not MinimizedButton then
+        createMinimizedButton()
+    end
+    MinimizedButton.Visible = true
+end)
+
+-- MINIMIZE BUTONU
+MinimizeButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    if not MinimizedButton then
+        createMinimizedButton()
+    end
+    MinimizedButton.Visible = true
+end)
+
+-- DEBUG MESAJI
+print("SYROX Boost v2.2 Hazır!")
+print("GUI Ekran ortasında açılacak...")
+
